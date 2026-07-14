@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Dashboards - DIMP-SESAP</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-layout">
+        <!-- Menu Lateral -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.png" alt="DIMP-SESAP Logo" class="sidebar-logo">
+                <div class="sidebar-titles">
+                    <h2>Painel</h2>
+                    <p id="userNameDisplay">Usuário</p>
+                </div>
+            </div>
+            
+            <nav id="dashboardNav" class="sidebar-nav">
+                <!-- Os botões dos dashboards serão injetados aqui via JS -->
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Área Principal -->
+        <main class="main-content">
+            <!-- Botão de Toggle -->
+            <button id="toggleSidebar" class="toggle-btn" title="Esconder Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div id="welcomeScreen" class="welcome-screen">
+                <i class="fa-solid fa-chart-line welcome-icon"></i>
+                <h2>Bem-vindo aos Dashboards</h2>
+                <p>Selecione uma das frentes no menu lateral para visualizar os dados.</p>
+            </div>
+            
+            <!-- O iframe carrega o site externo sem mudar a URL do navegador -->
+            <iframe id="dashboardFrame" class="dashboard-frame hidden" src="" frameborder="0"></iframe>
+        </main>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="dashboards.js"></script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - DIMP-SESAP</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="config.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.png" alt="DIMP-SESAP Logo" class="sidebar-logo">
+                <div>
+                    <h2>Configurações</h2>
+                    <p id="userNameDisplay">Admin</p>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboards.html" class="nav-item" style="text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Voltar ao Painel</a>
+                <button class="nav-item active" id="btnTabUsers"><i class="fa-solid fa-users"></i> Usuários</button>
+                <button class="nav-item" id="btnTabDashboards"><i class="fa-solid fa-link"></i> Dashboards</button>
+                <button class="nav-item" id="btnTabLogs"><i class="fa-solid fa-clock-rotate-left"></i> Acessos</button>
+            </nav>
+        </aside>
+        
+        <main class="main-content" style="padding: 30px; overflow-y: auto;">
+            <div class="config-header">
+                <h1>Painel de Administração</h1>
+                <p>Gerencie os usuários e os links dos relatórios.</p>
+            </div>
+
+            <!-- Aba Usuários -->
+            <div id="tabUsers" class="config-section">
+                <div class="card">
+                    <h3>Novo Usuário</h3>
+                    <form id="formUser" class="config-form">
+                        <input type="text" id="newUsername" placeholder="Nome de Usuário" required>
+                        <input type="password" id="newPassword" placeholder="Senha" required>
+                        
+                        <div class="checkbox-container">
+                            <p><strong>Acesso aos Dashboards:</strong></p>
+                            <div class="checkbox-group" id="dashboardCheckboxes">
+                                <!-- Checkboxes injetados pelo JS -->
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Salvar Usuário</button>
+                    </form>
+                </div>
+                
+                <div class="card mt-20">
+                    <h3>Usuários Cadastrados</h3>
+                    <ul id="userList" class="data-list">
+                        <!-- Lista de usuários via JS -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Aba Dashboards -->
+            <div id="tabDashboards" class="config-section hidden">
+                <div class="card">
+                    <h3>Nova Frente</h3>
+                    <form id="formDashboard" class="config-form">
+                        <input type="text" id="newDashName" placeholder="Nome da Frente (Ex: RH)" required>
+                        <input type="text" id="newDashLink" placeholder="Link (ou em-construcao.html)" required>
+                        <button type="submit" class="btn-primary">Salvar Dashboard</button>
+                    </form>
+                </div>
+
+                <div class="card mt-20">
+                    <h3>Frentes Cadastradas</h3>
+                    <ul id="dashboardList" class="data-list">
+                        <!-- Lista de dashboards via JS -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Aba Acessos (Auditoria) -->
+            <div id="tabLogs" class="config-section hidden">
+                <div class="card">
+                    <h3>Relatório de Acessos</h3>
+                    <p style="margin-bottom: 15px; color: #666; font-size: 14px;">Acompanhe quais frentes foram acessadas e o horário de acesso.</p>
+                    
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #eee;">
+                                    <th style="padding: 12px; color: var(--primary-color);">Data e Hora</th>
+                                    <th style="padding: 12px; color: var(--primary-color);">Usuário</th>
+                                    <th style="padding: 12px; color: var(--primary-color);">Dashboard Acessado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsTableBody">
+                                <!-- Injetado via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="config.js"></script>
+</body>
+</html>

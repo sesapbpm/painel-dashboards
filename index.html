@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso de Dashboards - DIMP-SESAP</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome para os ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fontes do Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-section">
+            <img src="logo.png" alt="DIMP-SESAP Logo" class="main-logo">
+        </div>
+
+        <div class="login-header">
+            <h2>Página de acesso de<br>Dashboards</h2>
+            <p>Entre com seu usuário e senha</p>
+        </div>
+
+        <form id="loginForm" class="login-form">
+            <div class="input-group">
+                <i class="fa-solid fa-envelope input-icon"></i>
+                <input type="text" id="username" placeholder="admin" required>
+            </div>
+            
+            <div class="input-group">
+                <i class="fa-solid fa-lock input-icon"></i>
+                <input type="password" id="password" placeholder="••••••" required>
+            </div>
+
+            <div class="form-actions">
+                <label class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <span>Lembrar acesso</span>
+                </label>
+                <a href="#" class="forgot-password">Esqueceu a senha?</a>
+            </div>
+
+            <button type="submit" class="btn-submit">Continuar</button>
+        </form>
+        
+        <div id="message" class="message hidden"></div>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
