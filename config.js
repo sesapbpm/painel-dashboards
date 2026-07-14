@@ -65,7 +65,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <strong>${username}</strong><br>
                     <small>Dashboards: ${userDashs}</small>
                 </div>
-                <button class="btn-danger" onclick="deleteUser('${username}')"><i class="fa-solid fa-trash"></i></button>
+                <div>
+                    <button class="btn-primary" style="padding: 8px 12px; margin-right: 5px;" onclick="editUser('${username}')" title="Editar Usuário"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn-danger" onclick="deleteUser('${username}')" title="Excluir Usuário"><i class="fa-solid fa-trash"></i></button>
+                </div>
             `;
             userList.appendChild(li);
         }
@@ -116,6 +119,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    window.editUser = async function(username) {
+        const users = await getUsers();
+        const userData = users[username];
+        if(!userData) return;
+
+        document.getElementById('newUsername').value = username;
+        document.getElementById('newPassword').value = userData.password;
+        
+        // Marca as caixinhas de dashboards corretas
+        document.querySelectorAll('input[name="dashboards"]').forEach(cb => {
+            cb.checked = userData.dashboards && userData.dashboards.includes(cb.value);
+        });
+
+        // Rola a tela para o formulário
+        document.getElementById('formUser').scrollIntoView({behavior: 'smooth'});
+    };
+
     // 4. Gerenciamento de Dashboards
     const formDashboard = document.getElementById('formDashboard');
     const dashboardList = document.getElementById('dashboardList');
@@ -130,7 +150,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <strong>${name}</strong><br>
                     <small>${link}</small>
                 </div>
-                <button class="btn-danger" onclick="deleteDashboard('${name}')"><i class="fa-solid fa-trash"></i></button>
+                <div>
+                    <button class="btn-primary" style="padding: 8px 12px; margin-right: 5px;" onclick="editDashboard('${name}')" title="Editar Frente"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn-danger" onclick="deleteDashboard('${name}')" title="Excluir Frente"><i class="fa-solid fa-trash"></i></button>
+                </div>
             `;
             dashboardList.appendChild(li);
         }
@@ -163,6 +186,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             await renderDashboardList();
             await renderDashboardCheckboxes();
         }
+    };
+
+    window.editDashboard = async function(name) {
+        const dashboards = await getDashboards();
+        const link = dashboards[name];
+        if(!link) return;
+
+        document.getElementById('newDashName').value = name;
+        document.getElementById('newDashLink').value = link;
+
+        // Rola a tela para o formulário
+        document.getElementById('formDashboard').scrollIntoView({behavior: 'smooth'});
     };
 
     // 5. Relatório de Acessos
