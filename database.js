@@ -1,73 +1,88 @@
-// Inicializa o banco de dados se não existir
-function initDatabase() {
-    if (!localStorage.getItem('db_dashboards')) {
+// Configuração do Firebase que você me enviou
+const firebaseConfig = {
+    apiKey: "AIzaSyAbSRhdyQnTk26LDa3Lf-oSnySt_3XoWzU",
+    authDomain: "painel-sesap.firebaseapp.com",
+    databaseURL: "https://painel-sesap-default-rtdb.firebaseio.com",
+    projectId: "painel-sesap",
+    storageBucket: "painel-sesap.firebasestorage.app",
+    messagingSenderId: "743723513834",
+    appId: "1:743723513834:web:a0fa0ff85be0f8b25ae493"
+};
+
+// Inicializa o Firebase
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const database = firebase.database();
+
+async function initDatabase() {
+    // Tenta pegar os usuários. Se não tiver admin, cria os padrões.
+    const usersSnap = await database.ref('users').once('value');
+    if (!usersSnap.exists()) {
+        const defaultUsers = {
+            'admin': {
+                password: '123',
+                dashboards: ['Sistemas', 'Aquisições', 'Compras', 'Manutenção']
+            },
+            'joao': {
+                password: 'senha_joao',
+                dashboards: ['Financeiro']
+            },
+            'maria': {
+                password: 'senha_maria',
+                dashboards: ['RH', 'Aquisições']
+            }
+        };
+        await database.ref('users').set(defaultUsers);
+    }
+
+    const dashSnap = await database.ref('dashboards').once('value');
+    if (!dashSnap.exists()) {
         const defaultDashboards = {
             'Sistemas': 'https://sesapbpm.github.io/DashboardContratos/',
             'Aquisições': 'https://sesapbpm.github.io/Dashs---Aquisi-es/',
             'Compras': 'em-construcao.html',
             'Manutenção': 'em-construcao.html'
         };
-        localStorage.setItem('db_dashboards', JSON.stringify(defaultDashboards));
-    }
-
-    if (!localStorage.getItem('db_users')) {
-        const defaultUsers = {
-            'admin': {
-                password: '123',
-                dashboards: ['Sistemas', 'Aquisições', 'Compras', 'Manutenção']
-            },
-            'maria': {
-                password: 'senha_maria',
-                dashboards: ['Aquisições']
-            }
-        };
-        localStorage.setItem('db_users', JSON.stringify(defaultUsers));
-    }
-
-    if (!localStorage.getItem('db_logs')) {
-        localStorage.setItem('db_logs', JSON.stringify([]));
+        await database.ref('dashboards').set(defaultDashboards);
     }
 }
 
-function getDashboards() {
-    return JSON.parse(localStorage.getItem('db_dashboards')) || {};
+async function getDashboards() {
+    const snap = await database.ref('dashboards').once('value');
+    return snap.val() || {};
 }
 
-function saveDashboards(dashboards) {
-    localStorage.setItem('db_dashboards', JSON.stringify(dashboards));
+async function saveDashboards(dashboards) {
+    await database.ref('dashboards').set(dashboards);
 }
 
-function getUsers() {
-    return JSON.parse(localStorage.getItem('db_users')) || {};
+async function getUsers() {
+    const snap = await database.ref('users').once('value');
+    return snap.val() || {};
 }
 
-function saveUsers(users) {
-    localStorage.setItem('db_users', JSON.stringify(users));
+async function saveUsers(users) {
+    await database.ref('users').set(users);
 }
 
-function getLogs() {
-    return JSON.parse(localStorage.getItem('db_logs')) || [];
+async function getLogs() {
+    // Busca ordenado pela data
+    const snap = await database.ref('logs').orderByChild('timestampValue').once('value');
+    const logsObj = snap.val() || {};
+    // Converte o objeto do Firebase (que usa IDs aleatórios) para array e inverte (mais novos primeiro)
+    return Object.values(logsObj).reverse();
 }
 
-function addLog(username, dashboardName) {
-    const logs = getLogs();
+async function addLog(username, dashboardName) {
     const now = new Date();
-    // Formata a data para DD/MM/YYYY HH:MM:SS
     const timestamp = now.toLocaleString('pt-BR');
     
-    logs.unshift({
+    // O push cria um ID único garantindo que acessos simultâneos não se sobrescrevam
+    await database.ref('logs').push({
         user: username,
         dashboard: dashboardName,
-        time: timestamp
+        time: timestamp,
+        timestampValue: now.getTime()
     });
-    
-    // Mantém no máximo 500 logs para não pesar
-    if(logs.length > 500) {
-        logs.pop();
-    }
-    
-    localStorage.setItem('db_logs', JSON.stringify(logs));
 }
-
-// Inicializa automaticamente
-initDatabase();

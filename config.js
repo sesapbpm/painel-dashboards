@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // 1. Verifica Acesso
     const userLogged = localStorage.getItem('userLogged');
     if (userLogged !== 'admin') {
@@ -32,14 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
         tabLogs.classList.add('hidden');
     });
 
-    btnTabLogs.addEventListener('click', () => {
+    btnTabLogs.addEventListener('click', async () => {
         btnTabLogs.classList.add('active');
         btnTabUsers.classList.remove('active');
         btnTabDashboards.classList.remove('active');
         tabLogs.classList.remove('hidden');
         tabUsers.classList.add('hidden');
         tabDashboards.classList.add('hidden');
-        renderLogs();
+        
+        // Exibe "Carregando..." enquanto busca da nuvem
+        const logsTableBody = document.getElementById('logsTableBody');
+        logsTableBody.innerHTML = '<tr><td colspan="3" style="padding: 15px; text-align: center; color: #888;">Carregando acessos da nuvem...</td></tr>';
+        
+        await renderLogs();
     });
 
     // 3. Gerenciamento de Usuários
@@ -47,17 +52,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const userList = document.getElementById('userList');
     const dashboardCheckboxes = document.getElementById('dashboardCheckboxes');
 
-    function renderUserList() {
-        const users = getUsers();
+    async function renderUserList() {
+        const users = await getUsers();
         userList.innerHTML = '';
         for (const [username, data] of Object.entries(users)) {
             if (username === 'admin') continue; // Não permite excluir o admin
             
             const li = document.createElement('li');
+            const userDashs = data.dashboards ? data.dashboards.join(', ') : 'Nenhum';
             li.innerHTML = `
                 <div>
                     <strong>${username}</strong><br>
-                    <small>Dashboards: ${data.dashboards.join(', ')}</small>
+                    <small>Dashboards: ${userDashs}</small>
                 </div>
                 <button class="btn-danger" onclick="deleteUser('${username}')"><i class="fa-solid fa-trash"></i></button>
             `;
@@ -65,8 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderDashboardCheckboxes() {
-        const dashboards = getDashboards();
+    async function renderDashboardCheckboxes() {
+        const dashboards = await getDashboards();
         dashboardCheckboxes.innerHTML = '';
         for (const name of Object.keys(dashboards)) {
             const label = document.createElement('label');
@@ -78,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    formUser.addEventListener('submit', (e) => {
+    formUser.addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = document.getElementById('newUsername').value.trim();
         const password = document.getElementById('newPassword').value;
@@ -86,27 +92,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!username || !password) return;
 
-        const users = getUsers();
+        const users = await getUsers();
         users[username] = {
             password: password,
             dashboards: selectedDashboards
         };
-        saveUsers(users);
+        await saveUsers(users);
         
         document.getElementById('newUsername').value = '';
         document.getElementById('newPassword').value = '';
         document.querySelectorAll('input[name="dashboards"]').forEach(cb => cb.checked = false);
         
-        renderUserList();
-        alert('Usuário salvo com sucesso!');
+        await renderUserList();
+        alert('Usuário salvo na nuvem com sucesso!');
     });
 
-    window.deleteUser = function(username) {
+    window.deleteUser = async function(username) {
         if(confirm(`Tem certeza que deseja excluir o usuário ${username}?`)) {
-            const users = getUsers();
+            const users = await getUsers();
             delete users[username];
-            saveUsers(users);
-            renderUserList();
+            await saveUsers(users);
+            await renderUserList();
         }
     };
 
@@ -114,8 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const formDashboard = document.getElementById('formDashboard');
     const dashboardList = document.getElementById('dashboardList');
 
-    function renderDashboardList() {
-        const dashboards = getDashboards();
+    async function renderDashboardList() {
+        const dashboards = await getDashboards();
         dashboardList.innerHTML = '';
         for (const [name, link] of Object.entries(dashboards)) {
             const li = document.createElement('li');
@@ -130,44 +136,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    formDashboard.addEventListener('submit', (e) => {
+    formDashboard.addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('newDashName').value.trim();
         const link = document.getElementById('newDashLink').value.trim();
 
         if (!name || !link) return;
 
-        const dashboards = getDashboards();
+        const dashboards = await getDashboards();
         dashboards[name] = link;
-        saveDashboards(dashboards);
+        await saveDashboards(dashboards);
         
         document.getElementById('newDashName').value = '';
         document.getElementById('newDashLink').value = '';
         
-        renderDashboardList();
-        renderDashboardCheckboxes(); // Atualiza os checkboxes da aba de usuários
-        alert('Frente salva com sucesso!');
+        await renderDashboardList();
+        await renderDashboardCheckboxes(); // Atualiza os checkboxes da aba de usuários
+        alert('Frente salva na nuvem com sucesso!');
     });
 
-    window.deleteDashboard = function(name) {
+    window.deleteDashboard = async function(name) {
         if(confirm(`Tem certeza que deseja excluir a frente ${name}?`)) {
-            const dashboards = getDashboards();
+            const dashboards = await getDashboards();
             delete dashboards[name];
-            saveDashboards(dashboards);
-            renderDashboardList();
-            renderDashboardCheckboxes();
+            await saveDashboards(dashboards);
+            await renderDashboardList();
+            await renderDashboardCheckboxes();
         }
     };
 
     // 5. Relatório de Acessos
-    function renderLogs() {
+    async function renderLogs() {
         const logsTableBody = document.getElementById('logsTableBody');
-        const logs = getLogs();
+        const logs = await getLogs();
         
         logsTableBody.innerHTML = '';
         
         if (logs.length === 0) {
-            logsTableBody.innerHTML = '<tr><td colspan="3" style="padding: 15px; text-align: center; color: #888;">Nenhum acesso registrado ainda.</td></tr>';
+            logsTableBody.innerHTML = '<tr><td colspan="3" style="padding: 15px; text-align: center; color: #888;">Nenhum acesso registrado na nuvem ainda.</td></tr>';
             return;
         }
         
@@ -175,16 +181,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const tr = document.createElement('tr');
             tr.style.borderBottom = '1px solid #eee';
             tr.innerHTML = `
-                <td style="padding: 12px; font-size: 14px; color: #555;">${log.time}</td>
-                <td style="padding: 12px; font-size: 14px; font-weight: 500; color: #333;">${log.user}</td>
-                <td style="padding: 12px; font-size: 14px; color: var(--accent-color);">${log.dashboard}</td>
+                <td style="padding: 12px; font-size: 14px; color: #555;">${log.time || 'N/A'}</td>
+                <td style="padding: 12px; font-size: 14px; font-weight: 500; color: #333;">${log.user || 'N/A'}</td>
+                <td style="padding: 12px; font-size: 14px; color: var(--accent-color);">${log.dashboard || 'N/A'}</td>
             `;
             logsTableBody.appendChild(tr);
         });
     }
 
     // Inicialização da UI
-    renderUserList();
-    renderDashboardCheckboxes();
-    renderDashboardList();
+    userList.innerHTML = '<li>Carregando...</li>';
+    dashboardList.innerHTML = '<li>Carregando...</li>';
+    
+    await renderUserList();
+    await renderDashboardCheckboxes();
+    await renderDashboardList();
 });

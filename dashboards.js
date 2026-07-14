@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // 1. Verifica se o usuário está logado
     const userLogged = localStorage.getItem('userLogged');
     const allowedDashboards = JSON.parse(localStorage.getItem('allowedDashboards') || '[]');
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('userNameDisplay').textContent = `Usuário: ${userLogged}`;
 
     // 2. Mapeamento de Links do Banco de Dados Local
-    const dashboardLinks = getDashboards();
+    const dashboardLinks = await getDashboards();
 
     const nav = document.getElementById('dashboardNav');
     const iframe = document.getElementById('dashboardFrame');

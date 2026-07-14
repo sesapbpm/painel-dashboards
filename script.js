@@ -2,22 +2,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const messageDiv = document.getElementById('message');
 
-    loginForm.addEventListener('submit', (e) => {
+    // Inicializa o banco de dados na nuvem se for a primeira vez
+    initDatabase();
+
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const usernameInput = document.getElementById('username').value.trim();
         const passwordInput = document.getElementById('password').value;
 
-        // Limpa mensagens anteriores
-        showMessage('', false);
+        // Mostra carregando
+        showMessage('Verificando credenciais na nuvem...', false);
 
-        const users = getUsers();
+        try {
+            const users = await getUsers();
 
-        // Verifica as credenciais no "banco de dados" local
-        if (users[usernameInput] && users[usernameInput].password === passwordInput) {
-            
-            // Login com sucesso
-            const userDashboards = users[usernameInput].dashboards;
+            // Verifica as credenciais no banco de dados
+            if (users[usernameInput] && users[usernameInput].password === passwordInput) {
+                
+                // Login com sucesso
+                const userDashboards = users[usernameInput].dashboards || [];
             
             // Aqui você pode salvar as permissões no localStorage para usar na próxima página
             localStorage.setItem('userLogged', usernameInput);
@@ -28,11 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Redireciona para a página interna do dashboard
             setTimeout(() => {
                 window.location.href = 'dashboards.html';
-            }, 1500);
+                }, 1500);
 
-        } else {
-            // Falha no login
-            showMessage('Usuário ou senha inválidos.', false, true);
+            } else {
+                // Falha no login
+                showMessage('Usuário ou senha incorretos!', false);
+            }
+        } catch (error) {
+            console.error(error);
+            showMessage('Erro ao conectar com o banco de dados.', false);
         }
     });
 
